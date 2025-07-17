@@ -1,75 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>My Completed Games CoverFlow</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"/>
-  <style>
-    body { background:#111; color:#fff; font-family:sans-serif; text-align:center; margin:0; }
-    h1 { margin:20px 0; }
-    .swiper { width:90%; height:400px; margin-top:40px; }
-    .swiper-slide { display:flex; flex-direction:column; align-items:center; }
-    .swiper-slide img {
-      width:250px; height:350px; object-fit:cover;
-      border-radius:10px; box-shadow:0 10px 20px rgba(0,0,0,0.5);
-      margin-bottom:10px;
-    }
-    .title {
-      font-size:14px;
-      max-width:250px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .loading { margin-top:50px; font-size:20px; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>My Completed Games CoverFlow</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"/>
+<style>
+  body {
+    background:#111;
+    color:#fff;
+    font-family:sans-serif;
+    text-align:center;
+    margin:0;
+  }
+  h1 { margin:20px 0; }
+  .swiper { width:90%; height:460px; margin-top:40px; }
+  .swiper-slide {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .swiper-slide img {
+    width:250px;
+    height:350px;
+    object-fit:cover;
+    border-radius:10px;
+    box-shadow:0 10px 20px rgba(0,0,0,0.5);
+    margin-bottom:6px;
+  }
+  .title {
+    font-size:14px;
+    max-width:250px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .completed {
+    font-size:12px;
+    color:#aaa;
+  }
+  .loading { margin-top:50px; font-size:20px; }
+</style>
 </head>
 <body>
-  <h1>🎮 My Completed Games</h1>
-  <div class="swiper mySwiper"><div class="swiper-wrapper" id="covers"></div></div>
-  <div class="loading" id="loading">Loading covers…</div>
+<h1>🎮 My Completed Games</h1>
+<div class="swiper mySwiper"><div class="swiper-wrapper" id="covers"></div></div>
+<div class="loading" id="loading">Loading covers…</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
-  <script>
-    async function loadCovers() {
-      try {
-        const res = await fetch('games.json'); // local file, no CORS issues
-        const games = await res.json();
+<script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+<script>
+const apiKey = "10653aadf8c849e29ddfd650833f9eab"; // ✅ your RAWG key
 
-        const wrapper = document.getElementById('covers');
-        games.forEach(game => {
+async function loadCovers() {
+  try {
+    const res = await fetch('games.json'); // load from external file
+    const games = await res.json();
+
+    const wrapper = document.getElementById('covers');
+
+    for (const entry of games) {
+      const title = entry.title;
+      const completedDate = entry.completed;
+
+      // Search RAWG for this title
+      const url = `https://api.rawg.io/api/games?key=${apiKey}&search=${encodeURIComponent(title)}`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.results && data.results.length > 0) {
+        const game = data.results[0];
+        const coverUrl = game.background_image;
+        if (coverUrl) {
           const slide = document.createElement('div');
           slide.className = 'swiper-slide';
           slide.innerHTML = `
-            <img src="${game.cover}" alt="${game.title}">
-            <div class="title">${game.title}</div>
+            <img src="${coverUrl}" alt="${title}">
+            <div class="title">${title}</div>
+            <div class="completed">Completed: ${completedDate}</div>
           `;
           wrapper.appendChild(slide);
-        });
-
-        document.getElementById('loading').style.display = 'none';
-
-        new Swiper('.mySwiper', {
-          effect: 'coverflow',
-          grabCursor: true,
-          centeredSlides: true,
-          slidesPerView: 'auto',
-          coverflowEffect: {
-            rotate:50,
-            stretch:0,
-            depth:100,
-            modifier:1,
-            slideShadows:true
-          },
-          loop: true
-        });
-      } catch (e) {
-        document.getElementById('loading').innerText = 'Error loading games.json.';
-        console.error(e);
+        }
       }
     }
-    loadCovers();
-  </script>
+
+    document.getElementById('loading').style.display = 'none';
+
+    new Swiper('.mySwiper', {
+      effect: 'coverflow',
+      grabCursor: true,
+      centeredSlides: true,
+      slidesPerView: 'auto',
+      coverflowEffect: {
+        rotate:50,
+        stretch:0,
+        depth:100,
+        modifier:1,
+        slideShadows:true
+      },
+      loop: true
+    });
+  } catch (e) {
+    document.getElementById('loading').innerText = 'Error loading covers.';
+    console.error(e);
+  }
+}
+
+loadCovers();
+</script>
 </body>
 </html>
