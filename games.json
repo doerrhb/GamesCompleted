@@ -1,26 +1,32 @@
 [
   {
     "title": "Halo Infinite",
-    "completed": "2024-02-15"
+    "completed": "2024-02-15",
+    "cover": "https://upload.wikimedia.org/wikipedia/en/a/a7/Halo_Infinite_cover_art.png"
   },
   {
     "title": "Elden Ring",
-    "completed": "2023-11-03"
+    "completed": "2023-11-03",
+    "cover": "https://upload.wikimedia.org/wikipedia/en/b/b9/Elden_Ring_Box_art.jpg"
   },
   {
-    "title": "God of War Ragnarok",
-    "completed": "2023-09-10"
+    "title": "God of War Ragnarök",
+    "completed": "2023-09-10",
+    "cover": "https://upload.wikimedia.org/wikipedia/en/6/6e/God_of_War_Ragnar%C3%B6k_cover.jpg"
   },
   {
     "title": "The Witcher 3: Wild Hunt",
-    "completed": "2023-07-01"
+    "completed": "2023-07-01",
+    "cover": "https://upload.wikimedia.org/wikipedia/en/0/0c/Witcher_3_cover_art.jpg"
   },
   {
     "title": "Celeste",
-    "completed": "2023-05-20"
+    "completed": "2023-05-20",
+    "cover": "https://upload.wikimedia.org/wikipedia/en/5/53/Celeste_box_art_final.png"
   },
   {
     "title": "Resident Evil 4",
-    "completed": "2023-04-10"
+    "completed": "2023-04-10",
+    "cover": "https://upload.wikimedia.org/wikipedia/en/0/07/Resident_Evil_4_remake_cover_art.jpg"
   }
 ]
