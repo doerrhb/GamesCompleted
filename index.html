@@ -9,9 +9,18 @@
     body { background:#111; color:#fff; font-family:sans-serif; text-align:center; margin:0; }
     h1 { margin:20px 0; }
     .swiper { width:90%; height:400px; margin-top:40px; }
+    .swiper-slide { display:flex; flex-direction:column; align-items:center; }
     .swiper-slide img {
       width:250px; height:350px; object-fit:cover;
       border-radius:10px; box-shadow:0 10px 20px rgba(0,0,0,0.5);
+      margin-bottom:10px;
+    }
+    .title {
+      font-size:14px;
+      max-width:250px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
     .loading { margin-top:50px; font-size:20px; }
   </style>
@@ -25,39 +34,21 @@
   <script>
     async function loadCovers() {
       try {
-        const target = 'https://backloggd.com/u/doerrhb/journal/';
-        const apiURL = 'https://api.allorigins.win/get?disableCache=true&url=' + encodeURIComponent(target);
-
-        const res = await fetch(apiURL);
-        if (!res.ok) throw new Error('Network response was not ok.');
-        const data = await res.json();
-        const html = data.contents;
-
-        // Parse HTML
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const imgs = doc.querySelectorAll('img');
+        const res = await fetch('games.json'); // local file, no CORS issues
+        const games = await res.json();
 
         const wrapper = document.getElementById('covers');
-        let count = 0;
-        imgs.forEach(img => {
-          const src = img.src;
-          if (src.includes('images.igdb.com')) {
-            const slide = document.createElement('div');
-            slide.className = 'swiper-slide';
-            slide.innerHTML = `<img src="${src}" alt="">`;
-            wrapper.appendChild(slide);
-            count++;
-          }
+        games.forEach(game => {
+          const slide = document.createElement('div');
+          slide.className = 'swiper-slide';
+          slide.innerHTML = `
+            <img src="${game.cover}" alt="${game.title}">
+            <div class="title">${game.title}</div>
+          `;
+          wrapper.appendChild(slide);
         });
 
         document.getElementById('loading').style.display = 'none';
-
-        if (count === 0) {
-          document.getElementById('loading').innerText = 'No covers found!';
-          document.getElementById('loading').style.display = 'block';
-          return;
-        }
 
         new Swiper('.mySwiper', {
           effect: 'coverflow',
@@ -74,7 +65,7 @@
           loop: true
         });
       } catch (e) {
-        document.getElementById('loading').innerText = 'Error loading covers.';
+        document.getElementById('loading').innerText = 'Error loading games.json.';
         console.error(e);
       }
     }
