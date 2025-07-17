@@ -24,10 +24,12 @@
   <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
   <script>
     async function loadCovers() {
-      const backloggdUrl = encodeURIComponent('https://backloggd.com/u/doerrhb/journal/');
       try {
-        // Use AllOrigins to bypass CORS
-        const res = await fetch(`https://api.allorigins.win/get?url=${backloggdUrl}`);
+        const target = 'https://backloggd.com/u/doerrhb/journal/';
+        const apiURL = 'https://api.allorigins.win/get?disableCache=true&url=' + encodeURIComponent(target);
+
+        const res = await fetch(apiURL);
+        if (!res.ok) throw new Error('Network response was not ok.');
         const data = await res.json();
         const html = data.contents;
 
@@ -40,7 +42,7 @@
         let count = 0;
         imgs.forEach(img => {
           const src = img.src;
-          if (src.includes('images.igdb.com')) { // filter only IGDB covers
+          if (src.includes('images.igdb.com')) {
             const slide = document.createElement('div');
             slide.className = 'swiper-slide';
             slide.innerHTML = `<img src="${src}" alt="">`;
@@ -57,13 +59,18 @@
           return;
         }
 
-        // Init Swiper
         new Swiper('.mySwiper', {
           effect: 'coverflow',
           grabCursor: true,
           centeredSlides: true,
           slidesPerView: 'auto',
-          coverflowEffect: { rotate:50, stretch:0, depth:100, modifier:1, slideShadows:true },
+          coverflowEffect: {
+            rotate:50,
+            stretch:0,
+            depth:100,
+            modifier:1,
+            slideShadows:true
+          },
           loop: true
         });
       } catch (e) {
