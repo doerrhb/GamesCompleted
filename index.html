@@ -14,16 +14,33 @@
     margin:0;
   }
   h1 {
-    margin:20px 0;
+    margin:20px 0 10px;
     font-size: 1.8rem;
+  }
+  #controls {
+    margin-bottom: 10px;
+  }
+  button {
+    background:#333;
+    color:#fff;
+    border:none;
+    padding:8px 14px;
+    margin:0 5px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:14px;
+  }
+  button:hover {
+    background:#555;
   }
   .swiper {
     width: 90%;
     height: 420px;
-    margin-top: 40px;
+    margin-top: 20px;
+    position: relative;
   }
   .swiper-slide {
-    width: 200px; /* fixed width for deck effect */
+    width: 200px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -52,15 +69,30 @@
     margin-top:50px;
     font-size:20px;
   }
+  /* Navigation arrows */
+  .swiper-button-next, .swiper-button-prev {
+    color: #fff;
+  }
 </style>
 </head>
 <body>
 <h1>🎮 My Completed Games</h1>
-<div class="swiper mySwiper"><div class="swiper-wrapper" id="covers"></div></div>
+<div id="controls">
+  <button id="toggleAutoplay">Pause Autoplay</button>
+</div>
+
+<div class="swiper mySwiper">
+  <div class="swiper-wrapper" id="covers"></div>
+  <!-- Arrows -->
+  <div class="swiper-button-next"></div>
+  <div class="swiper-button-prev"></div>
+</div>
 <div class="loading" id="loading">Loading covers…</div>
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
 <script>
+let swiper;
+
 async function loadCovers() {
   try {
     const res = await fetch('games.json');
@@ -80,13 +112,21 @@ async function loadCovers() {
 
     document.getElementById('loading').style.display = 'none';
 
-    new Swiper('.mySwiper', {
+    swiper = new Swiper('.mySwiper', {
       effect: 'coverflow',
       grabCursor: true,
       centeredSlides: true,
-      slidesPerView: 3,  // 👈 show center + neighbors
+      slidesPerView: 5, // 👈 show center + 2 on each side
       loop: true,
       speed: 600,
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      },
+      autoplay: {
+        delay: 2000,
+        disableOnInteraction: false,
+      },
       coverflowEffect: {
         rotate: 50,
         stretch: 0,
@@ -100,6 +140,18 @@ async function loadCovers() {
     console.error(e);
   }
 }
+
+// Toggle autoplay button
+document.getElementById('toggleAutoplay').addEventListener('click', () => {
+  if (!swiper) return;
+  if (swiper.autoplay.running) {
+    swiper.autoplay.stop();
+    document.getElementById('toggleAutoplay').innerText = 'Resume Autoplay';
+  } else {
+    swiper.autoplay.start();
+    document.getElementById('toggleAutoplay').innerText = 'Pause Autoplay';
+  }
+});
 
 loadCovers();
 </script>
