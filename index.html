@@ -19,6 +19,7 @@
     display:flex;
     flex-direction:column;
     align-items:center;
+    transition: transform 0.3s;
   }
   .swiper-slide img {
     width:250px;
@@ -49,39 +50,22 @@
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
 <script>
-const apiKey = "10653aadf8c849e29ddfd650833f9eab"; // ✅ your RAWG key
-
 async function loadCovers() {
   try {
-    const res = await fetch('games.json'); // load from external file
+    const res = await fetch('games.json');
     const games = await res.json();
 
     const wrapper = document.getElementById('covers');
-
-    for (const entry of games) {
-      const title = entry.title;
-      const completedDate = entry.completed;
-
-      // Search RAWG for this title
-      const url = `https://api.rawg.io/api/games?key=${apiKey}&search=${encodeURIComponent(title)}`;
-      const response = await fetch(url);
-      const data = await response.json();
-
-      if (data.results && data.results.length > 0) {
-        const game = data.results[0];
-        const coverUrl = game.background_image;
-        if (coverUrl) {
-          const slide = document.createElement('div');
-          slide.className = 'swiper-slide';
-          slide.innerHTML = `
-            <img src="${coverUrl}" alt="${title}">
-            <div class="title">${title}</div>
-            <div class="completed">Completed: ${completedDate}</div>
-          `;
-          wrapper.appendChild(slide);
-        }
-      }
-    }
+    games.forEach(game => {
+      const slide = document.createElement('div');
+      slide.className = 'swiper-slide';
+      slide.innerHTML = `
+        <img src="${game.cover}" alt="${game.title}">
+        <div class="title">${game.title}</div>
+        <div class="completed">Completed: ${game.completed}</div>
+      `;
+      wrapper.appendChild(slide);
+    });
 
     document.getElementById('loading').style.display = 'none';
 
@@ -90,14 +74,16 @@ async function loadCovers() {
       grabCursor: true,
       centeredSlides: true,
       slidesPerView: 'auto',
+      initialSlide: 2,
+      loop: true,
+      speed: 600,
       coverflowEffect: {
-        rotate:50,
-        stretch:0,
-        depth:100,
-        modifier:1,
-        slideShadows:true
-      },
-      loop: true
+        rotate: 45,
+        stretch: 0,
+        depth: 200,
+        modifier: 1,
+        slideShadows: true
+      }
     });
   } catch (e) {
     document.getElementById('loading').innerText = 'Error loading covers.';
